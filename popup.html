@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Coupons</title>
+    <style>
+        body {
+            width: 350px;
+            height: 500px;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .popup-container {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .popup-header {
+            margin-bottom: 20px;
+        }
+        
+        .popup-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .popup-header p {
+            margin: 8px 0 0 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .popup-content {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-list li::before {
+            content: "✓";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .popup-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .popup-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .popup-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .popup-btn.primary {
+            background: #ff9f43;
+            border-color: #ff9f43;
+        }
+        
+        .popup-btn.primary:hover {
+            background: #ff8a21;
+            border-color: #ff8a21;
+        }
+        
+        .popup-footer {
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 20px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .coupon-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .coupon-count h3 {
+            margin: 0 0 5px 0;
+            font-size: 24px;
+        }
+        
+        .coupon-count p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="popup-container">
+        <div class="popup-header">
+            <h1>🎟️ Amazon Coupons</h1>
+            <p>Save money with the best deals!</p>
+        </div>
+        
+        <div class="popup-content">
+            <div class="coupon-count">
+                <h3 id="couponCount">Loading...</h3>
+                <p>Available Coupons</p>
+            </div>
+            
+            <ul class="feature-list">
+                <li>Real-time coupon updates</li>
+                <li>Easy copy & paste codes</li>
+                <li>Direct links to deals</li>
+                <li>Works on all Amazon sites</li>
+            </ul>
+        </div>
+        
+        <div class="popup-actions">
+            <button class="popup-btn primary" id="openCoupons">
+                View Coupons
+            </button>
+            <button class="popup-btn" id="refreshData">
+                Refresh
+            </button>
+        </div>
+        
+        <div class="popup-footer">
+            <span class="status-indicator"></span>
+            Extension is active on Amazon
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Amazon Coupons Extension",
+  "version": "1.0",
+  "description": "Display available Amazon coupons in a convenient table format",
+  "permissions": [
+    "activeTab",
+    "storage"
+    
+
+  ],
+  "host_permissions": [
+    "*://*.amazon.com/*",
+    "*://*.amazon.in/*",
+    "*://*.amazon.co.uk/*",
+    "*://*.amazon.ca/*",
+    "*://*.amazon.de/*",
+    "*://*.amazon.fr/*",
+    "*://*.amazon.co.jp/*",
+    "*://*.amazon.com.au/*",
+    "https://dsnetx.web.app/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.amazon.com/*",
+        "*://*.amazon.in/*",
+        "*://*.amazon.co.uk/*",
+        "*://*.amazon.ca/*",
+        "*://*.amazon.de/*",
+        "*://*.amazon.fr/*",
+        "*://*.amazon.co.jp/*",
+        "*://*.amazon.com.au/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Amazon Coupons"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
