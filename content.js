@@ -1,4 +1,4 @@
-// Amazon Coupons Extension - Content Script
+// Amazon Coupons Extension - Content Script with Auto-Apply Feature
 class AmazonCouponsExtension {
   constructor() {
     this.apiUrl = 'https://dsnetx.web.app/apps/coupons/datav1.json';
@@ -28,51 +28,51 @@ class AmazonCouponsExtension {
   }
 
   createFloatingButton() {
-  const button = document.createElement('div');
-  button.id = 'amazon-coupons-btn';
-  button.className = 'amazon-coupons-floating-btn';
-  button.innerHTML = '🎟️ Coupons';
-  button.title = 'View Available Coupons';
+    const button = document.createElement('div');
+    button.id = 'amazon-coupons-btn';
+    button.className = 'amazon-coupons-floating-btn';
+    button.innerHTML = '🎟️ Coupons';
+    button.title = 'View Available Coupons';
 
-  // Default position
-  button.style.position = 'absolute';
-  button.style.top = '100px';
-  button.style.left = '20px';
-  button.style.cursor = 'grab';
-  button.style.zIndex = '9999';
-
-  // Drag functionality
-  let isDragging = false;
-  let offsetX, offsetY;
-
-  button.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    offsetX = e.clientX - button.getBoundingClientRect().left;
-    offsetY = e.clientY - button.getBoundingClientRect().top;
-    button.style.cursor = 'grabbing';
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (isDragging) {
-      button.style.left = `${e.clientX - offsetX}px`;
-      button.style.top = `${e.clientY - offsetY}px`;
-    }
-  });
-
-  document.addEventListener('mouseup', () => {
-    isDragging = false;
+    // Default position
+    button.style.position = 'absolute';
+    button.style.top = '100px';
+    button.style.left = '20px';
     button.style.cursor = 'grab';
-  });
+    button.style.zIndex = '9999';
 
-  // Toggle modal on click
-  button.addEventListener('click', () => {
-    if (!isDragging) {
-      this.toggleCouponModal();
-    }
-  });
+    // Drag functionality
+    let isDragging = false;
+    let offsetX, offsetY;
 
-  document.body.appendChild(button);
-}
+    button.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      offsetX = e.clientX - button.getBoundingClientRect().left;
+      offsetY = e.clientY - button.getBoundingClientRect().top;
+      button.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        button.style.left = `${e.clientX - offsetX}px`;
+        button.style.top = `${e.clientY - offsetY}px`;
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      button.style.cursor = 'grab';
+    });
+
+    // Toggle modal on click
+    button.addEventListener('click', () => {
+      if (!isDragging) {
+        this.toggleCouponModal();
+      }
+    });
+
+    document.body.appendChild(button);
+  }
 
   async fetchCoupons() {
     try {
@@ -185,10 +185,13 @@ class AmazonCouponsExtension {
         <td class="coupon-desc">${coupon.desc}</td>
         <td class="coupon-code">
           <span class="code">${coupon.code}</span>
-          <button class="copy-btn" onclick="navigator.clipboard.writeText('${coupon.code}').then(() => {
-            this.textContent = 'Copied!';
-            setTimeout(() => this.textContent = 'Copy', 1000);
-          })">Copy</button>
+          <div class="coupon-actions">
+            <button class="copy-btn" onclick="navigator.clipboard.writeText('${coupon.code}').then(() => {
+              this.textContent = 'Copied!';
+              setTimeout(() => this.textContent = 'Copy', 1000);
+            })">Copy</button>
+            <button class="apply-btn" data-coupon-code="${coupon.code}">Apply</button>
+          </div>
         </td>
         <td><span class="status ${statusClass}">${coupon.status}</span></td>
         <td class="end-date">${this.formatDate(coupon.endData)}</td>
@@ -203,11 +206,213 @@ class AmazonCouponsExtension {
       tbody.appendChild(row);
     });
     
+    // Add event listeners for apply buttons
+    this.attachApplyButtonListeners();
+    
     // Update count
     const countElement = document.getElementById('couponCount');
     if (countElement) {
       countElement.textContent = `${this.coupons.length} coupons available`;
     }
+  }
+
+  attachApplyButtonListeners() {
+    const applyButtons = document.querySelectorAll('.apply-btn');
+    applyButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const couponCode = e.target.getAttribute('data-coupon-code');
+        this.applyCoupon(couponCode, e.target);
+      });
+    });
+  }
+
+  async applyCoupon(couponCode, buttonElement) {
+    try {
+      // Show loading state
+      const originalText = buttonElement.textContent;
+      buttonElement.textContent = 'Applying...';
+      buttonElement.disabled = true;
+
+      // Step 1: Copy coupon code to clipboard
+      await navigator.clipboard.writeText(couponCode);
+      console.log('Coupon code copied to clipboard:', couponCode);
+
+      // Step 2: Find and fill the coupon input field
+      const success = await this.fillCouponInput(couponCode);
+      
+      if (success) {
+        buttonElement.textContent = 'Applied!';
+        buttonElement.style.backgroundColor = '#28a745';
+        
+        // Reset button after 3 seconds
+        setTimeout(() => {
+          buttonElement.textContent = originalText;
+          buttonElement.disabled = false;
+          buttonElement.style.backgroundColor = '';
+        }, 3000);
+      } else {
+        throw new Error('Could not find coupon input field');
+      }
+
+    } catch (error) {
+      console.error('Error applying coupon:', error);
+      buttonElement.textContent = 'Error';
+      buttonElement.style.backgroundColor = '#dc3545';
+      
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        buttonElement.textContent = 'Apply';
+        buttonElement.disabled = false;
+        buttonElement.style.backgroundColor = '';
+      }, 2000);
+    }
+  }
+
+  async fillCouponInput(couponCode) {
+    // Multiple selectors to handle different Amazon page layouts
+    const selectors = [
+      'input[name="ppw-claimCode"]',
+      'input[id*="claimCode"]',
+      'input[placeholder*="Enter Code"]',
+      'input[placeholder*="coupon"]',
+      'input[placeholder*="promo"]',
+      'input[class*="claim-code"]',
+      'input[class*="coupon-code"]',
+      'input[class*="promo-code"]',
+      'input[data-testid*="claim-code"]',
+      'input[aria-label*="coupon"]',
+      'input[aria-label*="promo"]'
+    ];
+
+    let inputField = null;
+    
+    // Try to find the input field using different selectors
+    for (const selector of selectors) {
+      inputField = document.querySelector(selector);
+      if (inputField) {
+        console.log('Found coupon input field with selector:', selector);
+        break;
+      }
+    }
+
+    if (!inputField) {
+      // Try to find by checking all input fields on the page
+      const allInputs = document.querySelectorAll('input[type="text"]');
+      for (const input of allInputs) {
+        const placeholder = input.placeholder?.toLowerCase() || '';
+        const ariaLabel = input.getAttribute('aria-label')?.toLowerCase() || '';
+        const className = input.className?.toLowerCase() || '';
+        const id = input.id?.toLowerCase() || '';
+        
+        if (placeholder.includes('code') || placeholder.includes('coupon') || 
+            ariaLabel.includes('code') || ariaLabel.includes('coupon') ||
+            className.includes('code') || className.includes('coupon') ||
+            id.includes('code') || id.includes('coupon')) {
+          inputField = input;
+          console.log('Found potential coupon input field:', input);
+          break;
+        }
+      }
+    }
+
+    if (!inputField) {
+      console.error('Could not find coupon input field');
+      return false;
+    }
+
+    // Clear the input field first
+    inputField.value = '';
+    inputField.focus();
+
+    // Fill the input field with the coupon code
+    inputField.value = couponCode;
+
+    // Trigger input events to ensure the form recognizes the change
+    const inputEvent = new Event('input', { bubbles: true });
+    const changeEvent = new Event('change', { bubbles: true });
+    
+    inputField.dispatchEvent(inputEvent);
+    inputField.dispatchEvent(changeEvent);
+
+    // Wait a moment for the form to process the input
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Step 3: Find and click the apply button
+    const applyButtonSuccess = await this.clickApplyButton();
+    
+    return applyButtonSuccess;
+  }
+
+  async clickApplyButton() {
+    // Multiple selectors for the apply button
+    const buttonSelectors = [
+      'button[class*="pmts-button-input"]',
+      'button[type="submit"]',
+      'input[type="submit"]',
+      'button[class*="apply"]',
+      'button[class*="claim"]',
+      'button[id*="apply"]',
+      'button[id*="claim"]',
+      'button[data-testid*="apply"]',
+      'button[aria-label*="apply"]',
+      'button[aria-label*="claim"]'
+    ];
+
+    let applyButton = null;
+
+    // Try to find the apply button using different selectors
+    for (const selector of buttonSelectors) {
+      applyButton = document.querySelector(selector);
+      if (applyButton) {
+        console.log('Found apply button with selector:', selector);
+        break;
+      }
+    }
+
+    if (!applyButton) {
+      // Try to find by checking all buttons on the page
+      const allButtons = document.querySelectorAll('button, input[type="submit"]');
+      for (const button of allButtons) {
+        const buttonText = button.textContent?.toLowerCase() || '';
+        const ariaLabel = button.getAttribute('aria-label')?.toLowerCase() || '';
+        const className = button.className?.toLowerCase() || '';
+        const id = button.id?.toLowerCase() || '';
+        
+        if (buttonText.includes('apply') || buttonText.includes('claim') ||
+            ariaLabel.includes('apply') || ariaLabel.includes('claim') ||
+            className.includes('apply') || className.includes('claim') ||
+            id.includes('apply') || id.includes('claim')) {
+          applyButton = button;
+          console.log('Found potential apply button:', button);
+          break;
+        }
+      }
+    }
+
+    if (!applyButton) {
+      console.error('Could not find apply button');
+      return false;
+    }
+
+    // Check if button is disabled
+    if (applyButton.disabled) {
+      console.log('Apply button is disabled, waiting...');
+      // Wait a moment and try again
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (applyButton.disabled) {
+        console.error('Apply button remains disabled');
+        return false;
+      }
+    }
+
+    // Click the apply button
+    applyButton.click();
+    console.log('Apply button clicked');
+
+    // Wait for the application to process
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    return true;
   }
 
   formatDate(dateString) {
@@ -246,3 +451,7 @@ class AmazonCouponsExtension {
 
 // Initialize the extension
 const amazonCouponsExtension = new AmazonCouponsExtension();
+
+
+
+
