@@ -18,7 +18,7 @@
     "*://*.amazon.fr/*",
     "*://*.amazon.co.jp/*",
     "*://*.amazon.com.au/*",
-    "https://dsnetx.web.app/*"
+    "https://amazonspot.net/apps/*"
   ],
   "content_scripts": [
     {

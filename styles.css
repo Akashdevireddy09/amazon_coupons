@@ -2,8 +2,8 @@
 
 /* Floating Button */
 .amazon-coupons-floating-btn {
-  
-  position: absolute; /* Enable movement */
+
+  position: fixed; /* Enable movement */
   top: 100px;
   left: 20px;          /* Replace right with left */
 
@@ -333,7 +333,7 @@
     font-size: 12px;
   }
 }
-.amazon-coupons-floating-btn {
+/* .amazon-coupons-floating-btn {
         background: linear-gradient(135deg, #ff9500, #ff6b35);
         color: white;
         border: none;
@@ -344,7 +344,7 @@
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         transition: all 0.3s ease;
         user-select: none;
-      }
+      } */
       
       .amazon-coupons-floating-btn:hover {
         transform: scale(1.05);
@@ -371,7 +371,7 @@
         border-radius: 12px;
         width: 95%;
         max-width: 1400px;
-        max-height: 90vh;
+        max-height: 100vh;
         overflow: hidden;
         box-shadow: 0 20px 40px rgba(0,0,0,0.3);
       }
@@ -415,7 +415,8 @@
         display: flex;
         gap: 30px;
         align-items: center;
-        flex-wrap: wrap;
+        flex-direction: row;
+         flex-wrap: wrap; 
         margin-bottom: 15px;
       }
       
@@ -439,13 +440,101 @@
         min-width: 200px;
       }
       
-      .amazon-coupons-stats {
+      .filter-dropdown {
+         position: relative;
+         width: 220px;
+      }
+
+.filter-dropdown input {
+  width: 100%;
+  padding: 8px 30px 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.filter-dropdown-arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #ff6b35;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-dropdown-options {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.filter-option {
+  padding: 8px 10px;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.filter-dropdown-options.active {
+  display: block;
+}
+
+.filter-dropdown-options label {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.filter-dropdown-options label:hover {
+  background-color: #f1f1f1;
+}
+      
+.filter-option input[type="checkbox"] {
+  margin-right: 8px;
+}
+.filter-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+
+.reset-btn {
+  margin-top: 10px;
+  margin-bottom: 0px;
+  padding: 6px 12px;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  background-color: white;
+  color: #007bff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.reset-btn:hover {
+  background-color: #f0f0ff;
+}
+.amazon-coupons-stats {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-top: 10px;
       }
-      
       .coupon-count {
         font-weight: 600;
         color: #333;
@@ -507,7 +596,7 @@
       .coupon-title {
         font-size: 16px;
         font-weight: 600;
-        color: #333;
+        color: orangered;
         margin: 0;
       }
       
@@ -624,17 +713,24 @@
         cursor: not-allowed;
       }
       
+
+      
       .pagination {
-        display: flex;
+        display: flex !important;
         justify-content: center;
         align-items: center;
         gap: 10px;
         padding: 20px;
-        border-top: 1px solid #e9ecef;
+        border-top: 1px solid #7eb4ea;
         background: #f8f9fa;
+        flex-wrap: wrap;
+        min-height: 50px;
+        position: relative;
+        bottom: 0;
+        z-index: 100;
       }
       
-      .pagination button {
+      .pagination-btn {
         padding: 8px 12px;
         border: 1px solid #dee2e6;
         background: white;
@@ -642,27 +738,53 @@
         cursor: pointer;
         font-size: 14px;
         transition: all 0.3s;
+        min-width: 40px;
+        font-weight: 500;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       }
       
-      .pagination button:hover:not(:disabled) {
-        background: #e9ecef;
-      }
-      
-      .pagination button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-      
-      .pagination button.active {
+      .pagination-btn:hover:not(:disabled) {
         background: #007bff;
         color: white;
         border-color: #007bff;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      }
+      
+      .pagination-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: #f8f9fa;
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .pagination-btn.active {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+        font-weight: 600;
+        box-shadow: 0 2px 5px rgba(0,123,255,0.3);
+      }
+      
+      .pagination-btn.active:hover {
+        background: #0056b3;
+        border-color: #0056b3;
+        transform: none;
+      }
+      
+      .pagination-dots {
+        padding: 8px 4px;
+        color: #6c757d;
+        font-weight: bold;
       }
       
       .pagination-info {
         font-size: 14px;
         color: #666;
         margin: 0 20px;
+        white-space: nowrap;
+        font-weight: 500;
       }
       
       .no-coupons {

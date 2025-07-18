@@ -1,6 +1,6 @@
  document.addEventListener('DOMContentLoaded', async function() {
-            const API_URL = 'https://dsnetx.web.app/apps/coupons/datav1.json';
-            
+            const API_URL = 'https://amazonspot.net/apps/PhpCRUDApi/apiCoupons.php/records/coupons?page=1,10&order=id,desc&filter=country,eq,US';
+
             // Load coupon count
             async function loadCouponCount() {
                 try {
