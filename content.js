@@ -506,6 +506,7 @@ class AmazonCouponsExtension {
       }, 2000);
     }
   }
+  
 
   updatePagination() {
     const paginationContainer = document.getElementById('paginationContainer');
@@ -528,26 +529,26 @@ class AmazonCouponsExtension {
     let paginationHTML = '';
     
     // Previous button
-    paginationHTML += `
-      <button class="pagination-btn" ${this.currentPage === 1 ? 'disabled' : ''} onclick="amazonCouponsExtension.goToPage(${this.currentPage - 1})">
-        Previous
-      </button>
-    `;
+paginationHTML += `
+  <button class="pagination-btn" ${this.currentPage === 1 ? 'disabled' : ''} data-page="${this.currentPage - 1}">
+    Previous
+  </button>
+`;
     
     // Page numbers
     const startPage = Math.max(1, this.currentPage - 2);
     const endPage = Math.min(this.totalPages, this.currentPage + 2);
     
     if (startPage > 1) {
-      paginationHTML += `<button class="pagination-btn" onclick="amazonCouponsExtension.goToPage(1)">1</button>`;
-      if (startPage > 2) {
-        paginationHTML += `<span class="pagination-dots">...</span>`;
-      }
-    }
+  paginationHTML += `<button class="pagination-btn" data-page="1">1</button>`;  // ✅ This is correct now
+  if (startPage > 2) {
+    paginationHTML += `<span class="pagination-dots">...</span>`;
+  }
+}
     
     for (let i = startPage; i <= endPage; i++) {
       paginationHTML += `
-        <button class="pagination-btn ${i === this.currentPage ? 'active' : ''}" onclick="amazonCouponsExtension.goToPage(${i})">
+        <button class="pagination-btn ${i === this.currentPage ? 'active' : ''}" data-page="${i}">
           ${i}
         </button>
       `;
@@ -557,12 +558,12 @@ class AmazonCouponsExtension {
       if (endPage < this.totalPages - 1) {
         paginationHTML += `<span class="pagination-dots">...</span>`;
       }
-      paginationHTML += `<button class="pagination-btn" onclick="amazonCouponsExtension.goToPage(${this.totalPages})">${this.totalPages}</button>`;
+      paginationHTML += `<button class="pagination-btn" data-page="${this.totalPages}">${this.totalPages}</button>`;
     }
     
     // Next button
     paginationHTML += `
-      <button class="pagination-btn" ${this.currentPage === this.totalPages ? 'disabled' : ''} onclick="amazonCouponsExtension.goToPage(${this.currentPage + 1})">
+      <button class="pagination-btn" ${this.currentPage === this.totalPages ? 'disabled' : ''} data-page="${this.currentPage + 1}">
         Next
       </button>
     `;
@@ -575,11 +576,28 @@ class AmazonCouponsExtension {
     `;
     
     paginationContainer.innerHTML = paginationHTML;
+    this.attachPaginationListeners();
   }
 
+  attachPaginationListeners() {
+  const paginationBtns = document.querySelectorAll('.pagination-btn');
+  paginationBtns.forEach(btn => {
+    if (!btn.disabled && btn.dataset.page) {
+      btn.addEventListener('click', () => {
+        const page = parseInt(btn.dataset.page);
+        this.goToPage(page);
+      });
+    }
+  });
+}
   async goToPage(page) {
     if (page < 1 || page > this.totalPages) return;
     
+     const container = document.getElementById('couponsContainer');
+  if (container) {
+    container.innerHTML = '<div class="loading">Loading coupons...</div>';
+  }
+  
     this.currentPage = page;
     await this.fetchCoupons();
     this.populateCoupons();
