@@ -443,7 +443,7 @@
       .filter-dropdown {
          position: relative;
          width: 220px;
-      }
+}
 
 .filter-dropdown input {
   width: 100%;
@@ -472,7 +472,7 @@
   top: 100%;
   left: 0;
   width: 100%;
-  max-height: 300px;
+  max-height: 200px;
   overflow-y: auto;
   background: white;
   border: 1px solid #ccc;
