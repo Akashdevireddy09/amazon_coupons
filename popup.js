@@ -6,8 +6,9 @@
                 try {
                     const response = await fetch(API_URL);
                     const data = await response.json();
-                    const coupons = Array.isArray(data) ? data : [];
-                    document.getElementById('couponCount').textContent = coupons.length;
+                    const total = data.results || (data.records ? data.records.length : 0);
+                     document.getElementById('couponCount').textContent = total;
+
                 } catch (error) {
                     console.error('Error loading coupon count:', error);
                     document.getElementById('couponCount').textContent = 'Error';
